@@ -25,16 +25,16 @@ async def run():
         absolute_altitude = terrain_info.absolute_altitude_m
         break
 
-    print("-- Arming")
-    await drone.action.arm()
+    #print("-- Arming")
+    #await drone.action.arm()
 
-    print("-- Taking off")
-    await drone.action.takeoff()
+    #print("-- Taking off")
+    #await drone.action.takeoff()
 
     await asyncio.sleep(1)
-    flying_alt = absolute_altitude + 20.0 #To fly drone 20m above the ground plane
-    #goto_location() takes Absolute MSL altitude 
-    await drone.action.goto_location(47.399386, 8.535245, flying_alt, 0)
+    flying_alt = absolute_altitude + 300.0 #To fly drone 20m above the ground plane
+    #goto_location() takes Absolute MSL altitude
+    await drone.action.goto_location(50.2163822, 15.7367417, flying_alt, 0)
 
 if __name__ == "__main__":
     loop = asyncio.get_event_loop()
