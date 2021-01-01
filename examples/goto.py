@@ -2,9 +2,9 @@
 
 import asyncio
 from mavsdk import System
+import sys
 
-
-async def run():
+async def run(latitude, longitude, altitude):
     drone = System()
     await drone.connect(system_address="udp://:14540")
 
@@ -22,20 +22,22 @@ async def run():
 
     print("Fetching amsl altitude at home location....")
     async for terrain_info in drone.telemetry.home():
-        absolute_altitude = terrain_info.absolute_altitude_m
+        terrain_altitude = terrain_info.absolute_altitude_m
+        print(f"Terrain altitude at home location is: {terrain_altitude:.0f} meters AMSL")
         break
 
-    #print("-- Arming")
-    #await drone.action.arm()
-
-    #print("-- Taking off")
-    #await drone.action.takeoff()
-
     await asyncio.sleep(1)
-    flying_alt = absolute_altitude + 300.0 #To fly drone 20m above the ground plane
+    flying_alt = terrain_altitude + altitude
+    print(f"New flying altitude is: {flying_alt:.0f} meters AMSL")
     #goto_location() takes Absolute MSL altitude
-    await drone.action.goto_location(50.2163822, 15.7367417, flying_alt, 0)
+    await drone.action.goto_location(latitude, longitude, flying_alt, 0)
 
 if __name__ == "__main__":
+
+    if len(sys.argv) != 4:
+    	sys.stderr.write("Invalid number of arguments.\n")
+    	sys.stderr.write("Usage: %s latitude[degrees] longitude[degrees] altitude_rel[meters]\n" % (sys.argv[0], ))
+    	sys.exit(1)
+
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(run())
+    loop.run_until_complete(run(eval(sys.argv[1]), eval(sys.argv[2]), eval(sys.argv[3])))
